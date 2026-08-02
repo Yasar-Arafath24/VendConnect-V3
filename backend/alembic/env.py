@@ -11,6 +11,8 @@ from alembic import context
 from app.core.config import settings
 from app.database.base import Base
 from app.modules.organizations import model  # noqa: F401  # register models
+from app.modules.rbac import model  # noqa: F401  # register models
+from app.modules.users import model  # noqa: F401  # register models
 
 config = context.config
 

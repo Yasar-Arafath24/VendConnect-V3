@@ -21,7 +21,7 @@ def create_access_token(
         )
     )
 
-    to_encode.update({"exp": expire})
+    to_encode.update({"exp": expire, "type": "access"})
 
     return jwt.encode(
         to_encode,
@@ -38,7 +38,7 @@ def create_refresh_token(
     )
 
     payload = data.copy()
-    payload.update({"exp": expire})
+    payload.update({"exp": expire, "type": "refresh"})
 
     return jwt.encode(
         payload,

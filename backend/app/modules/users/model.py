@@ -7,6 +7,7 @@ from sqlalchemy import (
     Table,
     Column,
     DateTime,
+    UniqueConstraint,
     func,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -22,16 +23,29 @@ user_roles = Table(
     "user_roles",
     Base.metadata,
     Column(
+        "id",
+        String(36),
+        primary_key=True,
+        default=lambda: str(uuid4()),
+    ),
+    Column(
         "user_id",
         String(36),
         ForeignKey("users.id", ondelete="CASCADE"),
-        primary_key=True,
+        nullable=False,
     ),
     Column(
         "role_id",
         String(36),
         ForeignKey("roles.id", ondelete="CASCADE"),
-        primary_key=True,
+        nullable=False,
+    ),
+    UniqueConstraint("user_id", "role_id", name="uq_user_roles_user_role"),
+    Column(
+        "assigned_at",
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
     ),
 )
 
