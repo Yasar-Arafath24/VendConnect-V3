@@ -8,6 +8,7 @@ from app.core.logging import app_logger
 from app.database.init_db import init_db
 from app.modules.auth.router import router as auth_router
 from app.modules.organizations.router import router as organization_router
+from app.modules.products.router import router as products_router
 from app.modules.rbac.router import router as rbac_router
 from app.modules.rbac.user_role_router import router as user_role_router
 from app.modules.users.router import router as users_router
@@ -32,6 +33,7 @@ app.include_router(rbac_router)
 app.include_router(users_router)
 app.include_router(auth_router)
 app.include_router(user_role_router)
+app.include_router(products_router)
 
 register_exception_handlers(app)
 
