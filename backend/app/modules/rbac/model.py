@@ -10,6 +10,7 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database.base import Base
+from app.modules.users.model import user_roles
 
 
 # ===========================
@@ -115,7 +116,7 @@ class Role(Base):
 
     users: Mapped[list["User"]] = relationship(
         "User",
-        secondary="user_roles",
+        secondary=user_roles,
         lazy="selectin",
         back_populates="roles",
     )

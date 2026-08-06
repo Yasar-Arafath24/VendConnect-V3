@@ -2,11 +2,14 @@ from uuid import uuid4
 
 from sqlalchemy.orm import Session
 
+from app.modules.brands.repository import BrandRepository
+from app.modules.categories.repository import CategoryRepository
 from app.modules.organizations.repository import OrganizationRepository
 from app.modules.products.model import Product
 from app.modules.products.repository import ProductRepository
 from app.modules.products.schema import ProductCreate, ProductUpdate
 from app.modules.products.utils import generate_sku
+from app.modules.units.repository import UnitRepository
 
 
 class ProductService:
@@ -34,6 +37,51 @@ class ProductService:
                 "Selling price cannot be less than cost price."
             )
 
+        # Validate category
+        if product_data.category_id:
+            category = CategoryRepository.get_by_id(
+                db,
+                product_data.category_id,
+            )
+
+            if (
+                category is None
+                or category.organization_id != organization_id
+            ):
+                raise ValueError(
+                    "Category not found."
+                )
+
+        # Validate brand
+        if product_data.brand_id:
+            brand = BrandRepository.get_by_id(
+                db,
+                product_data.brand_id,
+            )
+
+            if (
+                brand is None
+                or brand.organization_id != organization_id
+            ):
+                raise ValueError(
+                    "Brand not found."
+                )
+
+        # Validate unit
+        if product_data.unit_id:
+            unit = UnitRepository.get_by_id(
+                db,
+                product_data.unit_id,
+            )
+
+            if (
+                unit is None
+                or unit.organization_id != organization_id
+            ):
+                raise ValueError(
+                    "Unit not found."
+                )
+
         # Generate SKU
         sku = generate_sku(
             db,
@@ -46,13 +94,13 @@ class ProductService:
 
             category_id=product_data.category_id,
             brand_id=product_data.brand_id,
+            unit_id=product_data.unit_id,
 
             sku=sku,
             barcode=product_data.barcode,
 
             name=product_data.name,
             description=product_data.description,
-            unit=product_data.unit,
 
             cost_price=product_data.cost_price,
             selling_price=product_data.selling_price,
@@ -115,6 +163,51 @@ class ProductService:
             raise ValueError(
                 "Selling price cannot be less than cost price."
             )
+
+        # Validate category
+        if "category_id" in update_data and update_data["category_id"]:
+            category = CategoryRepository.get_by_id(
+                db,
+                update_data["category_id"],
+            )
+
+            if (
+                category is None
+                or category.organization_id != product.organization_id
+            ):
+                raise ValueError(
+                    "Category not found."
+                )
+
+        # Validate brand
+        if "brand_id" in update_data and update_data["brand_id"]:
+            brand = BrandRepository.get_by_id(
+                db,
+                update_data["brand_id"],
+            )
+
+            if (
+                brand is None
+                or brand.organization_id != product.organization_id
+            ):
+                raise ValueError(
+                    "Brand not found."
+                )
+
+        # Validate unit
+        if "unit_id" in update_data and update_data["unit_id"]:
+            unit = UnitRepository.get_by_id(
+                db,
+                update_data["unit_id"],
+            )
+
+            if (
+                unit is None
+                or unit.organization_id != product.organization_id
+            ):
+                raise ValueError(
+                    "Unit not found."
+                )
 
         for key, value in update_data.items():
             setattr(product, key, value)

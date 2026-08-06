@@ -39,16 +39,23 @@ class Product(Base):
     # ==========================
     # Classification
     # ==========================
-    # ForeignKey("categories.id") will be added when the categories module is built
     category_id: Mapped[str | None] = mapped_column(
-        String(36),
+        ForeignKey("categories.id", ondelete="SET NULL"),
         nullable=True,
     )
 
-    # ForeignKey("brands.id") will be added when the brands module is built
     brand_id: Mapped[str | None] = mapped_column(
         String(36),
+        ForeignKey("brands.id", ondelete="SET NULL"),
         nullable=True,
+        index=True,
+    )
+
+    unit_id: Mapped[str | None] = mapped_column(
+        String(36),
+        ForeignKey("units.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
     )
 
     # ==========================
@@ -77,11 +84,6 @@ class Product(Base):
     description: Mapped[str | None] = mapped_column(
         Text,
         nullable=True,
-    )
-
-    unit: Mapped[str] = mapped_column(
-        String(50),
-        nullable=False,
     )
 
     # ==========================
@@ -152,6 +154,21 @@ class Product(Base):
     # ==========================
     organization = relationship(
         "Organization",
+        back_populates="products",
+    )
+
+    category = relationship(
+        "Category",
+        back_populates="products",
+    )
+
+    brand = relationship(
+        "Brand",
+        back_populates="products",
+    )
+
+    unit = relationship(
+        "Unit",
         back_populates="products",
     )
 

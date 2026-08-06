@@ -99,3 +99,18 @@ class Organization(Base):
         "Product",
         back_populates="organization",
     )
+
+    categories = relationship(
+        "Category",
+        back_populates="organization",
+    )
+
+    brands = relationship(
+        "Brand",
+        back_populates="organization",
+    )
+
+    units = relationship(
+        "Unit",
+        back_populates="organization",
+    )

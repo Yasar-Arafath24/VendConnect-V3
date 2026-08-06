@@ -5,7 +5,11 @@ from app.database.database import engine
 from app.modules.organizations import model  # noqa: F401
 from app.modules.rbac import model  # noqa: F401
 from app.modules.users import model  # noqa: F401
+from app.modules.auth import model  # noqa: F401
 from app.modules.products import model  # noqa: F401
+from app.modules.categories import model  # noqa: F401
+from app.modules.brands import model  # noqa: F401
+from app.modules.units import model  # noqa: F401
 
 
 def init_db() -> None:

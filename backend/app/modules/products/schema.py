@@ -11,6 +11,7 @@ from pydantic import BaseModel, ConfigDict, Field
 class ProductBase(BaseModel):
     category_id: str | None = None
     brand_id: str | None = None
+    unit_id: str | None = None
 
     name: str = Field(
         ...,
@@ -19,12 +20,6 @@ class ProductBase(BaseModel):
     )
 
     description: str | None = None
-
-    unit: str = Field(
-        ...,
-        min_length=1,
-        max_length=50,
-    )
 
     cost_price: Decimal = Field(
         ...,
@@ -67,6 +62,7 @@ class ProductUpdate(BaseModel):
 
     category_id: str | None = None
     brand_id: str | None = None
+    unit_id: str | None = None
 
     name: str | None = Field(
         default=None,
@@ -75,8 +71,6 @@ class ProductUpdate(BaseModel):
     )
 
     description: str | None = None
-
-    unit: str | None = None
 
     cost_price: Decimal | None = Field(
         default=None,
