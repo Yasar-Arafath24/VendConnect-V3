@@ -28,6 +28,11 @@ DEFAULT_PERMISSIONS = [
     ("unit:delete", "unit", "delete"),
     ("unit:view", "unit", "view"),
 
+    ("warehouse:create", "warehouse", "create"),
+    ("warehouse:update", "warehouse", "update"),
+    ("warehouse:delete", "warehouse", "delete"),
+    ("warehouse:view", "warehouse", "view"),
+
     ("inventory:view", "inventory", "view"),
     ("inventory:update", "inventory", "update"),
 

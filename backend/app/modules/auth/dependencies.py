@@ -4,9 +4,9 @@ from sqlalchemy.orm import Session
 
 from app.core.jwt import decode_token
 from app.database.session import get_db
-from app.modules.rbac.user_role_repository import UserRoleRepository
 from app.modules.users.model import User
 from app.modules.users.repository import UserRepository
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
@@ -50,39 +50,34 @@ def require_permission(permission: str):
     Permission-based authorization dependency.
     """
 
-    def checker(
+    def permission_checker(
         current_user: User = Depends(get_current_user),
         db: Session = Depends(get_db),
     ):
 
-        assignments = UserRoleRepository.get_roles_by_user(
-            db,
-            current_user.id,
-        )
+        roles = current_user.roles
 
-        permissions = set()
-
-        for assignment in assignments:
-
-            role = assignment.role
-
-            if role:
-
-                permissions.update(
-                    p.key
-                    for p in role.permissions
-                )
-
-        if permission not in permissions:
-
+        if not roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Permission denied.",
+                detail="Role not found.",
             )
 
-        return current_user
+        for role in roles:
+            permission_keys = {
+                p.key
+                for p in role.permissions
+            }
 
-    return checker
+            if permission in permission_keys:
+                return current_user
+
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Permission denied.",
+        )
+
+    return permission_checker
 
 
 def require_role(role_name: str):

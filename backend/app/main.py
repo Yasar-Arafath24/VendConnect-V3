@@ -6,17 +6,26 @@ from app.core.config import settings
 from app.core.exceptions import register_exception_handlers
 from app.core.logging import app_logger
 from app.database.init_db import init_db
+from app.modules.organizations.router import router as organization_router
+from app.modules.rbac.router import router as rbac_router
+from app.modules.rbac.user_role_router import router as user_role_router
+from app.modules.users.router import router as users_router
 from app.modules.auth.router import router as auth_router
-from app.modules.brands.router import router as brands_router
+from app.modules.products.router import (
+    router as product_router,
+)
 from app.modules.categories.router import (
     router as category_router,
 )
-from app.modules.organizations.router import router as organization_router
-from app.modules.products.router import router as products_router
-from app.modules.rbac.router import router as rbac_router
-from app.modules.rbac.user_role_router import router as user_role_router
-from app.modules.units.router import router as units_router
-from app.modules.users.router import router as users_router
+from app.modules.brands.router import (
+    router as brand_router,
+)
+from app.modules.units.router import (
+    router as unit_router,
+)
+from app.modules.warehouses.router import (
+    router as warehouse_router,
+)
 
 
 @asynccontextmanager
@@ -38,11 +47,11 @@ app.include_router(rbac_router)
 app.include_router(users_router)
 app.include_router(auth_router)
 app.include_router(user_role_router)
-app.include_router(products_router)
+app.include_router(product_router)
 app.include_router(category_router)
-app.include_router(brands_router)
-app.include_router(units_router)
-
+app.include_router(brand_router)
+app.include_router(unit_router)
+app.include_router(warehouse_router)
 register_exception_handlers(app)
 
 

@@ -10,6 +10,7 @@ from app.modules.products import model  # noqa: F401
 from app.modules.categories import model  # noqa: F401
 from app.modules.brands import model  # noqa: F401
 from app.modules.units import model  # noqa: F401
+from app.modules.warehouses import model  # noqa: F401
 
 
 def init_db() -> None:

@@ -16,7 +16,7 @@ router = APIRouter(
 )
 
 @router.post(
-    "",
+    "/",
     response_model=CategoryResponse,
     status_code=status.HTTP_201_CREATED,
 )
@@ -40,9 +40,9 @@ def create_category(
             status_code=400,
             detail=str(e),
         )
-
+        
 @router.get(
-    "",
+    "/",
     response_model=list[CategoryResponse],
 )
 def get_categories(
@@ -54,23 +54,6 @@ def get_categories(
     return CategoryService.get_all(
         db,
         current_user.organization_id,
-    )
-
-@router.get(
-    "/search",
-    response_model=list[CategoryResponse],
-)
-def search_categories(
-    keyword: str = Query(..., min_length=1),
-    db: Session = Depends(get_db),
-    current_user=Depends(
-        require_permission("category:view")
-    ),
-):
-    return CategoryService.search(
-        db,
-        current_user.organization_id,
-        keyword,
     )
 
 @router.get(
@@ -97,6 +80,24 @@ def get_category(
 
     return category
 
+@router.get(
+    "/search/",
+    response_model=list[CategoryResponse],
+)
+def search_categories(
+    keyword: str = Query(..., min_length=1),
+    db: Session = Depends(get_db),
+    current_user=Depends(
+        require_permission("category:view")
+    ),
+):
+    return CategoryService.search(
+        db,
+        current_user.organization_id,
+        keyword,
+    )
+    
+
 @router.put(
     "/{category_id}",
     response_model=CategoryResponse,
@@ -122,10 +123,8 @@ def update_category(
             status_code=400,
             detail=str(e),
         )
-
-@router.delete(
-    "/{category_id}",
-)
+        
+@router.delete("/{category_id}")
 def delete_category(
     category_id: str,
     db: Session = Depends(get_db),
@@ -144,3 +143,4 @@ def delete_category(
             status_code=400,
             detail=str(e),
         )
+        

@@ -114,3 +114,8 @@ class Organization(Base):
         "Unit",
         back_populates="organization",
     )
+
+    warehouses = relationship(
+        "Warehouse",
+        back_populates="organization",
+    )

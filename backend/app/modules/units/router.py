@@ -5,9 +5,9 @@ from app.database.session import get_db
 from app.modules.auth.dependencies import require_permission
 from app.modules.units.schema import (
     UnitCreate,
-    UnitListResponse,
-    UnitResponse,
     UnitUpdate,
+    UnitResponse,
+    UnitListResponse,
 )
 from app.modules.units.service import UnitService
 
@@ -16,9 +16,9 @@ router = APIRouter(
     tags=["Units"],
 )
 
-
+#create unit
 @router.post(
-    "",
+    "/",
     response_model=UnitResponse,
     status_code=status.HTTP_201_CREATED,
 )
@@ -42,10 +42,10 @@ def create_unit(
             status_code=400,
             detail=str(e),
         )
-
-
+        
+#get all units
 @router.get(
-    "",
+    "/",
     response_model=UnitListResponse,
 )
 def get_units(
@@ -57,31 +57,13 @@ def get_units(
     ),
 ):
     return UnitService.get_all(
-        db,
-        current_user.organization_id,
-        skip,
-        limit,
+        db=db,
+        organization_id=current_user.organization_id,
+        skip=skip,
+        limit=limit,
     )
-
-
-@router.get(
-    "/search",
-    response_model=list[UnitResponse],
-)
-def search_units(
-    keyword: str = Query(..., min_length=1),
-    db: Session = Depends(get_db),
-    current_user=Depends(
-        require_permission("unit:view")
-    ),
-):
-    return UnitService.search(
-        db,
-        current_user.organization_id,
-        keyword,
-    )
-
-
+    
+#get unit by id
 @router.get(
     "/{unit_id}",
     response_model=UnitResponse,
@@ -106,7 +88,25 @@ def get_unit(
 
     return unit
 
-
+#search unit
+@router.get(
+    "/search/",
+    response_model=list[UnitResponse],
+)
+def search_units(
+    keyword: str = Query(..., min_length=1),
+    db: Session = Depends(get_db),
+    current_user=Depends(
+        require_permission("unit:view")
+    ),
+):
+    return UnitService.search(
+        db,
+        current_user.organization_id,
+        keyword,
+    )
+    
+#update unit
 @router.put(
     "/{unit_id}",
     response_model=UnitResponse,
@@ -132,8 +132,8 @@ def update_unit(
             status_code=400,
             detail=str(e),
         )
-
-
+        
+#delete unit
 @router.delete("/{unit_id}")
 def delete_unit(
     unit_id: str,
@@ -153,3 +153,5 @@ def delete_unit(
             status_code=400,
             detail=str(e),
         )
+        
+
