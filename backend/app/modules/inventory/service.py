@@ -634,6 +634,8 @@ class InventoryService:
             # Modify Source
             # ==========================================
 
+            source_before = source_inventory.quantity
+
             source_inventory.quantity -= (
                 transfer.quantity
             )
@@ -643,6 +645,12 @@ class InventoryService:
             # ==========================================
             # Modify Destination
             # ==========================================
+
+            destination_before = (
+                destination_inventory.quantity
+                if destination_inventory is not None
+                else 0
+            )
 
             if destination_inventory is None:
 
@@ -668,6 +676,74 @@ class InventoryService:
                 )
 
                 destination_inventory.updated_by = user_id
+
+            # ==========================================
+            # Record Movements
+            # ==========================================
+
+            InventoryMovementService.create(
+                db=db,
+
+                organization_id=organization_id,
+
+                inventory_id=source_inventory.id,
+
+                product_id=transfer.product_id,
+
+                warehouse_id=transfer.from_warehouse_id,
+
+                movement_type=(
+                    InventoryMovementType.TRANSFER_OUT
+                ),
+
+                quantity=-(transfer.quantity),
+
+                quantity_before=source_before,
+
+                quantity_after=source_inventory.quantity,
+
+                user_id=user_id,
+
+                reason=transfer.reason,
+
+                reference_type="INVENTORY_TRANSFER",
+
+                reference_id=destination_inventory.id,
+
+                commit=False,
+            )
+
+            InventoryMovementService.create(
+                db=db,
+
+                organization_id=organization_id,
+
+                inventory_id=destination_inventory.id,
+
+                product_id=transfer.product_id,
+
+                warehouse_id=transfer.to_warehouse_id,
+
+                movement_type=(
+                    InventoryMovementType.TRANSFER_IN
+                ),
+
+                quantity=transfer.quantity,
+
+                quantity_before=destination_before,
+
+                quantity_after=destination_inventory.quantity,
+
+                user_id=user_id,
+
+                reason=transfer.reason,
+
+                reference_type="INVENTORY_TRANSFER",
+
+                reference_id=source_inventory.id,
+
+                commit=False,
+            )
 
             # ==========================================
             # SINGLE COMMIT

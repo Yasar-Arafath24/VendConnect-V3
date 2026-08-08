@@ -101,6 +101,11 @@ class StockTransfer(BaseModel):
         gt=0,
     )
 
+    reason: str | None = Field(
+        default=None,
+        max_length=255,
+    )
+
 
 # ==========================================
 # Response
