@@ -16,3 +16,5 @@ from app.modules.categories.model import Category  # noqa: E402, F401
 from app.modules.brands.model import Brand  # noqa: E402, F401
 from app.modules.units.model import Unit  # noqa: E402, F401
 from app.modules.warehouses.model import Warehouse  # noqa: E402, F401
+from app.modules.inventory.model import Inventory  # noqa: E402, F401
+from app.modules.inventory.movement_model import InventoryMovement  # noqa: E402, F401

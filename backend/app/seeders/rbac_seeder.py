@@ -35,6 +35,8 @@ DEFAULT_PERMISSIONS = [
 
     ("inventory:view", "inventory", "view"),
     ("inventory:update", "inventory", "update"),
+    ("inventory:create", "inventory", "create"),
+    ("inventory:delete", "inventory", "delete"),
 
     ("order:create", "order", "create"),
     ("order:update", "order", "update"),

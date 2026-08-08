@@ -4,7 +4,6 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     String,
-    UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -12,21 +11,14 @@ from sqlalchemy.sql import func
 from app.database.base import Base
 
 
-class Inventory(Base):
-    __tablename__ = "inventory"
+class InventoryMovement(Base):
 
-    __table_args__ = (
-        UniqueConstraint(
-            "organization_id",
-            "warehouse_id",
-            "product_id",
-            name="uq_inventory_product_warehouse",
-        ),
-    )
+    __tablename__ = "inventory_movements"
 
     # ==========================================
     # Primary Key
     # ==========================================
+
     id = Column(
         String,
         primary_key=True,
@@ -36,69 +28,113 @@ class Inventory(Base):
     # ==========================================
     # Organization
     # ==========================================
+
     organization_id = Column(
         String,
-        ForeignKey("organizations.id", ondelete="CASCADE"),
+        ForeignKey(
+            "organizations.id",
+            ondelete="CASCADE",
+        ),
         nullable=False,
         index=True,
     )
 
     # ==========================================
-    # References
+    # Inventory
     # ==========================================
-    warehouse_id = Column(
+
+    inventory_id = Column(
         String,
-        ForeignKey("warehouses.id", ondelete="CASCADE"),
+        ForeignKey(
+            "inventory.id",
+            ondelete="CASCADE",
+        ),
         nullable=False,
         index=True,
     )
+
+    # ==========================================
+    # Product / Warehouse
+    # ==========================================
 
     product_id = Column(
         String,
-        ForeignKey("products.id", ondelete="CASCADE"),
+        ForeignKey(
+            "products.id",
+            ondelete="CASCADE",
+        ),
+        nullable=False,
+        index=True,
+    )
+
+    warehouse_id = Column(
+        String,
+        ForeignKey(
+            "warehouses.id",
+            ondelete="CASCADE",
+        ),
         nullable=False,
         index=True,
     )
 
     # ==========================================
-    # Stock Information
+    # Movement Information
     # ==========================================
+
+    movement_type = Column(
+        String,
+        nullable=False,
+        index=True,
+    )
+
     quantity = Column(
         Integer,
         nullable=False,
-        default=0,
-    )
-
-    reserved_quantity = Column(
-        Integer,
-        nullable=False,
-        default=0,
-    )
-
-    reorder_level = Column(
-        Integer,
-        nullable=False,
-        default=0,
-    )
-
-    max_stock_level = Column(
-        Integer,
-        nullable=False,
-        default=0,
     )
 
     # ==========================================
-    # Audit Fields
+    # Stock Snapshot
     # ==========================================
-    created_by = Column(
+
+    quantity_before = Column(
+        Integer,
+        nullable=False,
+    )
+
+    quantity_after = Column(
+        Integer,
+        nullable=False,
+    )
+
+    # ==========================================
+    # Reference
+    # ==========================================
+
+    reference_type = Column(
         String,
-        ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
     )
 
-    updated_by = Column(
+    reference_id = Column(
         String,
-        ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+
+    reason = Column(
+        String,
+        nullable=True,
+    )
+
+    # ==========================================
+    # Audit
+    # ==========================================
+
+    created_by = Column(
+        String,
+        ForeignKey(
+            "users.id",
+            ondelete="SET NULL",
+        ),
         nullable=True,
     )
 
@@ -108,45 +144,27 @@ class Inventory(Base):
         nullable=False,
     )
 
-    updated_at = Column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-        onupdate=func.now(),
-        nullable=False,
-    )
-
     # ==========================================
     # Relationships
     # ==========================================
+
     organization = relationship(
         "Organization",
-        back_populates="inventory_items",
     )
 
-    warehouse = relationship(
-        "Warehouse",
-        back_populates="inventory_items",
+    inventory = relationship(
+        "Inventory",
     )
 
     product = relationship(
         "Product",
-        back_populates="inventory_items",
+    )
+
+    warehouse = relationship(
+        "Warehouse",
     )
 
     creator = relationship(
         "User",
         foreign_keys=[created_by],
     )
-
-    updater = relationship(
-        "User",
-        foreign_keys=[updated_by],
-    )
-
-    @property
-    def available_quantity(self):
-        """
-        Quantity available for sale.
-        Not stored in the database.
-        """
-        return self.quantity - self.reserved_quantity

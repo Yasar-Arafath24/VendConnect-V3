@@ -26,7 +26,15 @@ from app.modules.units.router import (
 from app.modules.warehouses.router import (
     router as warehouse_router,
 )
-
+from app.modules.inventory.router import (
+    router as inventory_router,
+)
+from app.modules.inventory.router import (
+    router as inventory_router,
+)
+from app.modules.inventory.movement_router import (
+    router as inventory_movement_router,
+)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -52,6 +60,8 @@ app.include_router(category_router)
 app.include_router(brand_router)
 app.include_router(unit_router)
 app.include_router(warehouse_router)
+app.include_router(inventory_movement_router)
+app.include_router(inventory_router)
 register_exception_handlers(app)
 
 

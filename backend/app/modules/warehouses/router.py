@@ -16,7 +16,7 @@ router = APIRouter(
     tags=["Warehouses"],
 )
 
-
+#create warehouse
 @router.post(
     "/",
     response_model=WarehouseResponse,
@@ -42,8 +42,8 @@ def create_warehouse(
             status_code=400,
             detail=str(e),
         )
-
-
+        
+#get all warehouses
 @router.get(
     "/",
     response_model=WarehouseListResponse,
@@ -62,26 +62,8 @@ def get_warehouses(
         skip=skip,
         limit=limit,
     )
-
-
-@router.get(
-    "/search/",
-    response_model=list[WarehouseResponse],
-)
-def search_warehouses(
-    keyword: str = Query(..., min_length=1),
-    db: Session = Depends(get_db),
-    current_user=Depends(
-        require_permission("warehouse:view")
-    ),
-):
-    return WarehouseService.search(
-        db,
-        current_user.organization_id,
-        keyword,
-    )
-
-
+    
+#get warehouse by ID
 @router.get(
     "/{warehouse_id}",
     response_model=WarehouseResponse,
@@ -106,7 +88,29 @@ def get_warehouse(
 
     return warehouse
 
-
+#search warehouses
+@router.get(
+    "/search/",
+    response_model=list[WarehouseResponse],
+)
+def search_warehouses(
+    keyword: str = Query(..., min_length=1),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=100),
+    db: Session = Depends(get_db),
+    current_user=Depends(
+        require_permission("warehouse:view")
+    ),
+):
+    return WarehouseService.search(
+        db=db,
+        organization_id=current_user.organization_id,
+        keyword=keyword,
+        skip=skip,
+        limit=limit,
+    )
+    
+#update warehouse
 @router.put(
     "/{warehouse_id}",
     response_model=WarehouseResponse,
@@ -132,8 +136,8 @@ def update_warehouse(
             status_code=400,
             detail=str(e),
         )
-
-
+        
+#delete warehouse
 @router.delete("/{warehouse_id}")
 def delete_warehouse(
     warehouse_id: str,
@@ -153,3 +157,4 @@ def delete_warehouse(
             status_code=400,
             detail=str(e),
         )
+        

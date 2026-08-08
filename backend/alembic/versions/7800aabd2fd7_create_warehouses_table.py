@@ -20,6 +20,9 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Upgrade schema."""
+    if sa.inspect(op.get_bind()).has_table("warehouses"):
+        return
+
     op.create_table(
         'warehouses',
         sa.Column('id', sa.String(), nullable=False),

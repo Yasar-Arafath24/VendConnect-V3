@@ -137,6 +137,12 @@ class Warehouse(Base):
         back_populates="warehouses",
     )
 
+    inventory_items = relationship(
+        "Inventory",
+        back_populates="warehouse",
+        cascade="all, delete-orphan",
+    )
+
     creator = relationship(
         "User",
         foreign_keys=[created_by],

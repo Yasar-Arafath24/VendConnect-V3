@@ -172,6 +172,11 @@ class Product(Base):
         back_populates="products",
     )
 
+    inventory_items = relationship(
+        "Inventory",
+        back_populates="product",
+    )
+
     creator = relationship(
         "User",
         foreign_keys=[created_by],

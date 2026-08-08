@@ -119,3 +119,8 @@ class Organization(Base):
         "Warehouse",
         back_populates="organization",
     )
+
+    inventory_items = relationship(
+        "Inventory",
+        back_populates="organization",
+    )

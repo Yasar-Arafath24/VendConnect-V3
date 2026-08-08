@@ -27,14 +27,21 @@ def upgrade() -> None:
         'products',
         sa.Column('unit_id', sa.String(length=36), nullable=True),
     )
-    op.create_foreign_key(
-        'products_unit_id_fkey',
-        'products',
-        'units',
-        ['unit_id'],
-        ['id'],
-        ondelete='SET NULL',
-    )
+    bind = op.get_bind()
+    fk_names = [
+        fk["name"]
+        for fk in sa.inspect(bind).get_foreign_keys("products")
+    ]
+
+    if "products_unit_id_fkey" not in fk_names:
+        with op.batch_alter_table('products') as batch_op:
+            batch_op.create_foreign_key(
+                'products_unit_id_fkey',
+                'units',
+                ['unit_id'],
+                ['id'],
+                ondelete='SET NULL',
+            )
     op.create_index(
         op.f('ix_products_unit_id'),
         'products',
@@ -51,5 +58,16 @@ def downgrade() -> None:
         sa.Column('unit', sa.String(length=50), nullable=False),
     )
     op.drop_index(op.f('ix_products_unit_id'), table_name='products')
-    op.drop_constraint('products_unit_id_fkey', 'products', type_='foreignkey')
+    bind = op.get_bind()
+    fk_names = [
+        fk["name"]
+        for fk in sa.inspect(bind).get_foreign_keys("products")
+    ]
+
+    if "products_unit_id_fkey" in fk_names:
+        with op.batch_alter_table('products') as batch_op:
+            batch_op.drop_constraint(
+                'products_unit_id_fkey',
+                type_='foreignkey',
+            )
     op.drop_column('products', 'unit_id')
