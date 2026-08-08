@@ -1,3 +1,6 @@
+from enum import Enum
+
+
 class InventoryMovementType:
 
     STOCK_IN = "STOCK_IN"
@@ -19,3 +22,14 @@ class InventoryMovementType:
     RETURN_IN = "RETURN_IN"
 
     RETURN_OUT = "RETURN_OUT"
+
+
+class InventoryStatus(str, Enum):
+
+    OUT_OF_STOCK = "OUT_OF_STOCK"
+
+    LOW_STOCK = "LOW_STOCK"
+
+    HEALTHY = "HEALTHY"
+
+    OVERSTOCKED = "OVERSTOCKED"
