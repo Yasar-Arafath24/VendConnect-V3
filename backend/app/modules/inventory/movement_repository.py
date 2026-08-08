@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy.orm import Session
 
 from app.modules.inventory.movement_model import InventoryMovement
@@ -157,6 +159,120 @@ class InventoryMovementRepository:
             .limit(limit)
             .all()
         )
+
+    # ==========================================
+    # Search with Filters
+    # ==========================================
+
+    @staticmethod
+    def search(
+        db: Session,
+        organization_id: str,
+        movement_type: str | None = None,
+        product_id: str | None = None,
+        warehouse_id: str | None = None,
+        inventory_id: str | None = None,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+        skip: int = 0,
+        limit: int = 20,
+    ):
+
+        query = (
+            db.query(InventoryMovement)
+            .filter(
+                InventoryMovement.organization_id
+                == organization_id
+            )
+        )
+
+        # ==========================================
+        # Movement Type
+        # ==========================================
+
+        if movement_type is not None:
+
+            query = query.filter(
+                InventoryMovement.movement_type
+                == movement_type
+            )
+
+        # ==========================================
+        # Product
+        # ==========================================
+
+        if product_id is not None:
+
+            query = query.filter(
+                InventoryMovement.product_id
+                == product_id
+            )
+
+        # ==========================================
+        # Warehouse
+        # ==========================================
+
+        if warehouse_id is not None:
+
+            query = query.filter(
+                InventoryMovement.warehouse_id
+                == warehouse_id
+            )
+
+        # ==========================================
+        # Inventory
+        # ==========================================
+
+        if inventory_id is not None:
+
+            query = query.filter(
+                InventoryMovement.inventory_id
+                == inventory_id
+            )
+
+        # ==========================================
+        # Start Date
+        # ==========================================
+
+        if start_date is not None:
+
+            query = query.filter(
+                InventoryMovement.created_at
+                >= start_date
+            )
+
+        # ==========================================
+        # End Date
+        # ==========================================
+
+        if end_date is not None:
+
+            query = query.filter(
+                InventoryMovement.created_at
+                <= end_date
+            )
+
+        # ==========================================
+        # Count
+        # ==========================================
+
+        total = query.count()
+
+        # ==========================================
+        # Pagination
+        # ==========================================
+
+        items = (
+            query
+            .order_by(
+                InventoryMovement.created_at.desc()
+            )
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
+
+        return total, items
 
     # ==========================================
     # Get All

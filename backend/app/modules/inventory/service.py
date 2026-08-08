@@ -10,6 +10,7 @@ from app.modules.inventory.model import Inventory
 from app.modules.inventory.repository import InventoryRepository
 from app.modules.inventory.schema import (
     InventoryCreate,
+    InventoryFilter,
     InventoryUpdate,
     StockAdjustment,
     StockTransfer,
@@ -182,6 +183,45 @@ class InventoryService:
                 skip=skip,
                 limit=limit,
             ),
+        }
+
+    # ==========================================
+    # Search with Filters
+    # ==========================================
+
+    @staticmethod
+    def search(
+        db: Session,
+        organization_id: str,
+        filters: InventoryFilter,
+    ):
+
+        if (
+            filters.min_quantity is not None
+            and filters.max_quantity is not None
+            and filters.min_quantity > filters.max_quantity
+        ):
+            raise ValueError(
+                "Minimum quantity cannot be greater than maximum quantity."
+            )
+
+        if (
+            filters.low_stock_only
+            and filters.out_of_stock_only
+        ):
+            raise ValueError(
+                "Cannot combine low_stock_only with out_of_stock_only."
+            )
+
+        total, items = InventoryRepository.search(
+            db,
+            organization_id,
+            filters,
+        )
+
+        return {
+            "total": total,
+            "items": items,
         }
 
     # ==========================================

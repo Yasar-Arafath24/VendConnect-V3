@@ -2,9 +2,75 @@ from sqlalchemy import and_, func
 from sqlalchemy.orm import Session
 
 from app.modules.inventory.model import Inventory
+from app.modules.inventory.schema import InventoryFilter
 
 
 class InventoryRepository:
+
+    @staticmethod
+    def _apply_filters(
+        query,
+        filters: InventoryFilter,
+    ):
+
+        if filters.product_id:
+            query = query.filter(
+                Inventory.product_id == filters.product_id
+            )
+
+        if filters.warehouse_id:
+            query = query.filter(
+                Inventory.warehouse_id == filters.warehouse_id
+            )
+
+        if filters.min_quantity is not None:
+            query = query.filter(
+                Inventory.quantity >= filters.min_quantity
+            )
+
+        if filters.max_quantity is not None:
+            query = query.filter(
+                Inventory.quantity <= filters.max_quantity
+            )
+
+        if filters.low_stock_only:
+            query = query.filter(
+                Inventory.quantity <= Inventory.reorder_level
+            )
+
+        if filters.out_of_stock_only:
+            query = query.filter(
+                Inventory.quantity == 0
+            )
+
+        return query
+
+    @staticmethod
+    def search(
+        db: Session,
+        organization_id: str,
+        filters: InventoryFilter,
+    ):
+
+        query = db.query(Inventory).filter(
+            Inventory.organization_id == organization_id
+        )
+
+        query = InventoryRepository._apply_filters(
+            query,
+            filters,
+        )
+
+        total = query.count()
+
+        items = (
+            query.order_by(Inventory.created_at.desc())
+            .offset(filters.skip)
+            .limit(filters.limit)
+            .all()
+        )
+
+        return total, items
 
     @staticmethod
     def create(

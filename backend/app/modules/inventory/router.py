@@ -5,6 +5,7 @@ from app.database.session import get_db
 from app.modules.auth.dependencies import require_permission
 from app.modules.inventory.schema import (
     InventoryCreate,
+    InventoryFilter,
     InventoryUpdate,
     InventoryResponse,
     InventoryListResponse,
@@ -127,6 +128,49 @@ def adjust_stock(
             adjustment=adjustment,
             organization_id=current_user.organization_id,
             user_id=current_user.id,
+        )
+
+    except ValueError as e:
+        raise HTTPException(
+            status_code=400,
+            detail=str(e),
+        )
+
+
+@router.get(
+    "/search",
+    response_model=InventoryListResponse,
+)
+def search_inventory(
+    product_id: str | None = None,
+    warehouse_id: str | None = None,
+    min_quantity: int | None = Query(default=None, ge=0),
+    max_quantity: int | None = Query(default=None, ge=0),
+    low_stock_only: bool = False,
+    out_of_stock_only: bool = False,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=100),
+    db: Session = Depends(get_db),
+    current_user=Depends(
+        require_permission("inventory:view")
+    ),
+):
+    filters = InventoryFilter(
+        product_id=product_id,
+        warehouse_id=warehouse_id,
+        min_quantity=min_quantity,
+        max_quantity=max_quantity,
+        low_stock_only=low_stock_only,
+        out_of_stock_only=out_of_stock_only,
+        skip=skip,
+        limit=limit,
+    )
+
+    try:
+        return InventoryService.search(
+            db=db,
+            organization_id=current_user.organization_id,
+            filters=filters,
         )
 
     except ValueError as e:

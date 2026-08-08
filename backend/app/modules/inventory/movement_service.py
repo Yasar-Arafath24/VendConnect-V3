@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from uuid import uuid4
 
 from sqlalchemy.orm import Session
@@ -314,4 +316,73 @@ class InventoryMovementService:
                 skip,
                 limit,
             ),
+        }
+
+    # ==========================================
+    # Search with Filters
+    # ==========================================
+
+    @staticmethod
+    def search(
+        db: Session,
+        organization_id: str,
+        movement_type: str | None = None,
+        product_id: str | None = None,
+        warehouse_id: str | None = None,
+        inventory_id: str | None = None,
+        start_date: datetime | None = None,
+        end_date: datetime | None = None,
+        skip: int = 0,
+        limit: int = 20,
+    ):
+
+        # ==========================================
+        # Validate Date Range
+        # ==========================================
+
+        if (
+            start_date is not None
+            and end_date is not None
+            and start_date > end_date
+        ):
+            raise ValueError(
+                "Start date cannot be later than end date."
+            )
+
+        # ==========================================
+        # Validate Pagination
+        # ==========================================
+
+        if skip < 0:
+            raise ValueError(
+                "Skip cannot be negative."
+            )
+
+        if limit < 1 or limit > 100:
+            raise ValueError(
+                "Limit must be between 1 and 100."
+            )
+
+        # ==========================================
+        # Search
+        # ==========================================
+
+        total, items = (
+            InventoryMovementRepository.search(
+                db=db,
+                organization_id=organization_id,
+                movement_type=movement_type,
+                product_id=product_id,
+                warehouse_id=warehouse_id,
+                inventory_id=inventory_id,
+                start_date=start_date,
+                end_date=end_date,
+                skip=skip,
+                limit=limit,
+            )
+        )
+
+        return {
+            "total": total,
+            "items": items,
         }

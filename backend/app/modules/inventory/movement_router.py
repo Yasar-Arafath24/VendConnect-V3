@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
@@ -36,6 +38,66 @@ def get_movements(
         skip=skip,
         limit=limit,
     )
+
+#search movement history with filters
+@router.get(
+    "/search",
+    response_model=InventoryMovementListResponse,
+)
+def search_movements(
+    movement_type: str | None = Query(
+        default=None,
+    ),
+    product_id: str | None = Query(
+        default=None,
+    ),
+    warehouse_id: str | None = Query(
+        default=None,
+    ),
+    inventory_id: str | None = Query(
+        default=None,
+    ),
+    start_date: datetime | None = Query(
+        default=None,
+    ),
+    end_date: datetime | None = Query(
+        default=None,
+    ),
+    skip: int = Query(
+        default=0,
+        ge=0,
+    ),
+    limit: int = Query(
+        default=20,
+        ge=1,
+        le=100,
+    ),
+    db: Session = Depends(get_db),
+    current_user=Depends(
+        require_permission("inventory:view")
+    ),
+):
+    try:
+
+        return InventoryMovementService.search(
+            db=db,
+            organization_id=current_user.organization_id,
+            movement_type=movement_type,
+            product_id=product_id,
+            warehouse_id=warehouse_id,
+            inventory_id=inventory_id,
+            start_date=start_date,
+            end_date=end_date,
+            skip=skip,
+            limit=limit,
+        )
+
+    except ValueError as exc:
+
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        )
     
 #get movement by id
 @router.get(

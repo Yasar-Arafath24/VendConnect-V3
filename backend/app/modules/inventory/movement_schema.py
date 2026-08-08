@@ -67,6 +67,10 @@ class InventoryMovementFilter(BaseModel):
 
     inventory_id: str | None = None
 
+    start_date: datetime | None = None
+
+    end_date: datetime | None = None
+
     skip: int = Field(
         default=0,
         ge=0,
