@@ -189,3 +189,20 @@ class InventoryListResponse(BaseModel):
     total: int
 
     items: list[InventoryResponse]
+    
+    
+class InventorySummaryResponse(BaseModel):
+
+    inventory_count: int
+
+    total_quantity: int
+
+    total_reserved_quantity: int
+
+    total_available_quantity: int
+
+    total_inventory_value: float
+
+    low_stock_count: int
+
+    out_of_stock_count: int

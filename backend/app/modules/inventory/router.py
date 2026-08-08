@@ -9,10 +9,14 @@ from app.modules.inventory.schema import (
     InventoryUpdate,
     InventoryResponse,
     InventoryListResponse,
+    InventorySummaryResponse,
     StockAdjustment,
     StockTransfer,
 )
 from app.modules.inventory.service import InventoryService
+from app.modules.inventory.summary_service import (
+    InventorySummaryService,
+)
 
 router = APIRouter(
     prefix="/inventory",
@@ -178,6 +182,22 @@ def search_inventory(
             status_code=400,
             detail=str(e),
         )
+
+
+@router.get(
+    "/summary",
+    response_model=InventorySummaryResponse,
+)
+def get_inventory_summary(
+    db: Session = Depends(get_db),
+    current_user=Depends(
+        require_permission("inventory:view")
+    ),
+):
+    return InventorySummaryService.get_summary(
+        db=db,
+        organization_id=current_user.organization_id,
+    )
 
 
 @router.get(
