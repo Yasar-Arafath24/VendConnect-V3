@@ -3,6 +3,9 @@ from sqlalchemy.orm import Session
 from app.modules.inventory.query_repository import (
     InventoryQueryRepository,
 )
+from app.modules.inventory.status_service import (
+    InventoryStatusService,
+)
 
 
 class InventoryQueryService:
@@ -73,6 +76,17 @@ class InventoryQueryService:
             skip=skip,
             limit=limit,
         )
+
+        # ==========================================
+        # Enrich With Computed Status
+        # ==========================================
+
+        for item in items:
+
+            item.status = (
+                InventoryStatusService
+                .classify_inventory(item)
+            )
 
         return {
             "total": total,

@@ -41,3 +41,18 @@ class InventoryStatusService:
         # ==========================================
 
         return InventoryStatus.HEALTHY
+
+    # ==========================================
+    # Classify Inventory Record
+    # ==========================================
+
+    @staticmethod
+    def classify_inventory(
+        inventory,
+    ) -> InventoryStatus:
+
+        return InventoryStatusService.classify(
+            quantity=inventory.quantity,
+            reorder_level=inventory.reorder_level,
+            max_stock_level=inventory.max_stock_level,
+        )

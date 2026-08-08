@@ -5,7 +5,6 @@ from app.database.session import get_db
 from app.modules.auth.dependencies import require_permission
 from app.modules.inventory.schema import (
     InventoryCreate,
-    InventoryFilter,
     InventoryUpdate,
     InventoryResponse,
     InventoryListResponse,
@@ -14,6 +13,9 @@ from app.modules.inventory.schema import (
     StockTransfer,
 )
 from app.modules.inventory.service import InventoryService
+from app.modules.inventory.query_service import (
+    InventoryQueryService,
+)
 from app.modules.inventory.summary_service import (
     InventorySummaryService,
 )
@@ -159,22 +161,18 @@ def search_inventory(
         require_permission("inventory:view")
     ),
 ):
-    filters = InventoryFilter(
-        product_id=product_id,
-        warehouse_id=warehouse_id,
-        min_quantity=min_quantity,
-        max_quantity=max_quantity,
-        low_stock_only=low_stock_only,
-        out_of_stock_only=out_of_stock_only,
-        skip=skip,
-        limit=limit,
-    )
-
     try:
-        return InventoryService.search(
+        return InventoryQueryService.search(
             db=db,
             organization_id=current_user.organization_id,
-            filters=filters,
+            product_id=product_id,
+            warehouse_id=warehouse_id,
+            min_quantity=min_quantity,
+            max_quantity=max_quantity,
+            low_stock_only=low_stock_only,
+            out_of_stock_only=out_of_stock_only,
+            skip=skip,
+            limit=limit,
         )
 
     except ValueError as e:

@@ -1,5 +1,6 @@
 from datetime import datetime
-
+from app.modules.inventory.constants import InventoryStatus
+status: InventoryStatus
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -170,6 +171,8 @@ class InventoryResponse(BaseModel):
     max_stock_level: int
 
     available_quantity: int
+
+    status: str | None = None
 
     created_by: str | None
 

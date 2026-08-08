@@ -92,6 +92,10 @@ class InventoryQueryRepository:
                 <= Inventory.reorder_level
             )
 
+            query = query.filter(
+                Inventory.quantity > 0
+            )
+
         # ==========================================
         # Count
         # ==========================================
