@@ -108,6 +108,42 @@ class StockTransfer(BaseModel):
 
 
 # ==========================================
+# Query / Filter
+# ==========================================
+
+class InventoryFilter(BaseModel):
+
+    product_id: str | None = None
+
+    warehouse_id: str | None = None
+
+    min_quantity: int | None = Field(
+        default=None,
+        ge=0,
+    )
+
+    max_quantity: int | None = Field(
+        default=None,
+        ge=0,
+    )
+
+    low_stock_only: bool = False
+
+    out_of_stock_only: bool = False
+
+    skip: int = Field(
+        default=0,
+        ge=0,
+    )
+
+    limit: int = Field(
+        default=20,
+        ge=1,
+        le=100,
+    )
+
+
+# ==========================================
 # Response
 # ==========================================
 
